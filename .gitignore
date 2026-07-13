@@ -1,0 +1,6 @@
+.env
+*.db
+*.exe
+node_modules/
+dist/
+.vscode/settings.json
