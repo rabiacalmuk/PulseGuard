@@ -1,0 +1,36 @@
+name: Send Push Notification Email
+
+on:
+  push:
+    branches:
+      - '**' # Tüm branch'lerde yapılan push'larda çalışır
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          # SMTP Sunucu Ayarları (Gmail için)
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          
+          # GitHub Secrets'tan Çekilen Bilgiler
+          username: ${{ secrets.MAIL_RABIA }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          
+          # Bildirim Detayları
+          subject: "[PulseGuard] ${{ github.repository }} deposuna yeni push yapıldı!"
+          to: mert.ozturk@dataflowx.com
+          from: GitHub Bildirim: rabiaacalmuk@gmail.com 
+          
+          # E-posta İçeriği
+          html_body: |
+            PulseGuard Projesine Yeni Push Yapıldı!
+            Depo: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Push Yapan: ${{ github.actor }}
+            Commit Mesajı: ${{ github.event.head_commit.message }}
+            Commit'i GitHub'da İncele
