@@ -19,21 +19,21 @@ func (d DiskCheck) Name() string { // check tipinin adını döndüren metot
 func (d DiskCheck) Run() (CheckResult, error) { //check tipinin tek bir ölçümden ürettiği ham sonucu döndüren metot
 	usage, err := disk.Usage(d.Mount) //gopsutil'in disk.Usage fonksiyonu çağrılır, bu OS'den gerçek disk kullanım bilgisini okur
 	if err != nil {
-		return CheckResult{}, fmt.Errorf("disk usage okunamadi (%s): %w", d.Mount, err)
-	} //mount noktası geçersizse veya veya disk bilgisi okunamazsa boş bir CheckResult ve bir hata mesajı döndürülür, orijinal hatayı sarmalayarak saklarız(sarmalamak eski hatanın yok olmaması ve yeni mesajın içinde saklanmasını ifade eder, %w ile sağlanır)
+		return CheckResult{}, fmt.Errorf("disk usage okunamadi: %w", err)
+	} //mount noktası geçersizse veya disk bilgisi okunamazsa boş bir CheckResult ve bir hata mesajı döndürülür, orijinal hatayı sarmalayarak saklarız
 
 	percent := usage.UsedPercent //kullanım yüzdesi okunur
 
-	level := LevelInfo                                                     //varsayılan level ınfo olarak ayarlanıyor
-	message := fmt.Sprintf("Disk kullanimi %.1f%% (%s)", percent, d.Mount) //varsayılan mesaj normal durumlar için
+	level := DetermineLevel(percent, d.ThresholdWarn, d.ThresholdError)
 
-	switch { //disk kullanım yüzdesine göre level ve mesaj belirleniyor
-	case percent >= d.ThresholdError: //disk kullanım yüzdesi error eşiğini geçtiyse
-		level = LevelError
+	var message string
+	switch level {
+	case LevelError:
 		message = fmt.Sprintf("Disk kullanimi %.1f%%, hata esigi %.1f%% asildi (%s)", percent, d.ThresholdError, d.Mount)
-	case percent >= d.ThresholdWarn: //disk kullanım yüzdesi warning eşiğini geçtiyse
-		level = LevelWarning
+	case LevelWarning:
 		message = fmt.Sprintf("Disk kullanimi %.1f%%, uyari esigi %.1f%% asildi (%s)", percent, d.ThresholdWarn, d.Mount)
+	default:
+		message = fmt.Sprintf("Disk kullanimi %.1f%% (%s)", percent, d.Mount)
 	}
 
 	return CheckResult{
