@@ -1,0 +1,28 @@
+collector:
+  url: "http://localhost:8080"
+  auth_token: "${PULSEGUARD_AGENT_TOKEN}"
+  batch_interval_seconds: 30
+  retry_backoff_seconds: [5, 15, 60, 300]
+
+host:
+  id: "local-test-host"
+  tags: ["dev", "test"]
+
+checks:
+  - type: cpu
+    interval_seconds: 15
+    threshold_warning: 75
+    threshold_error: 90
+  - type: ram
+    interval_seconds: 15
+    threshold_warning: 80
+    threshold_error: 95
+  - type: disk
+    interval_seconds: 60
+    mount: "C:"
+    threshold_warning: 85
+    threshold_error: 92
+
+queue:
+  path: "./queue.db"
+  max_size_mb: 200
