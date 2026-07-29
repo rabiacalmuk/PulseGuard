@@ -3,7 +3,7 @@ name: Send Push Notification Email
 on:
   push:
     branches:
-      - '**' # Tüm branch'lerde yapılan push'larda çalışır
+      - '**'
 
 jobs:
   send-email:
@@ -12,25 +12,21 @@ jobs:
       - name: Send Mail
         uses: dawidd6/action-send-mail@v3
         with:
-          # SMTP Sunucu Ayarları (Gmail için)
           server_address: smtp.gmail.com
           server_port: 465
           secure: true
           
-          # GitHub Secrets'tan Çekilen Bilgiler
           username: ${{ secrets.MAIL_RABIA }}
           password: ${{ secrets.MAIL_PASSWORD }}
           
-          # Bildirim Detayları
-          subject: "[PulseGuard] ${{ github.repository }} deposuna yeni push yapıldı!"
+          subject: "[PulseGuard] ${{ github.repository }} deposuna yeni push yapildi!"
           to: mert.ozturk@dataflowx.com
-          from: GitHub Bildirim: rabiaacalmuk@gmail.com 
+          from: "GitHub Bildirim <rabiaacalmuk@gmail.com>"
           
-          # E-posta İçeriği
           html_body: |
-            PulseGuard Projesine Yeni Push Yapıldı!
-            Depo: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
-            Push Yapan: ${{ github.actor }}
-            Commit Mesajı: ${{ github.event.head_commit.message }}
-            Commit'i GitHub'da İncele
+            <h3>PulseGuard Projesine Yeni Push Yapildi!</h3>
+            <p><b>Depo:</b> ${{ github.repository }}</p>
+            <p><b>Branch:</b> ${{ github.ref_name }}</p>
+            <p><b>Push Yapan:</b> ${{ github.actor }}</p>
+            <p><b>Commit Mesaji:</b> ${{ github.event.head_commit.message }}</p>
+            <p><a href="${{ github.event.head_commit.url }}">Commit'i GitHub'da İncele</a></p>
