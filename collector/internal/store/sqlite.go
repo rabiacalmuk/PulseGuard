@@ -25,6 +25,7 @@ func Open(path string) (*Store, error) { //veritabanını açan ve gerekli tablo
 
 	return &Store{db: db}, nil
 }
+
 func (s *Store) Close() error {
 	return s.db.Close()
 }
