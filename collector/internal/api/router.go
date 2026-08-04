@@ -19,5 +19,7 @@ func NewServer(s *store.Store, secret []byte) *Server { //server struct'ını ol
 func (s *Server) Router() *http.ServeMux { //URL'leri handlerlara bağlayan fonksiyon
 	mux := http.NewServeMux() //GO'nun standart router'ı
 	mux.HandleFunc("POST /api/v1/batches", s.handleCreateBatch)
+	mux.HandleFunc("GET /api/v1/hosts", s.handleListHosts)
+	mux.HandleFunc("GET /api/v1/events", s.handleListEvents)
 	return mux
 }
