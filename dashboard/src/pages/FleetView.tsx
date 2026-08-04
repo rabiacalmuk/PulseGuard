@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { getHosts, type Host } from "../api/client";
 import { HostCard } from "../components/HostCard";
 
-export function FleetView() {
+interface Props {
+  onSelectHost: (hostId: string) => void;
+}
+
+export function FleetView({ onSelectHost }: Props) {
   const [hosts, setHosts] = useState<Host[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +37,7 @@ export function FleetView() {
   return (
     <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
       {hosts.map((h) => (
-        <HostCard key={h.host_id} host={h} />
+        <HostCard key={h.host_id} host={h} onClick={() => onSelectHost(h.host_id)} />
       ))}
     </div>
   );
