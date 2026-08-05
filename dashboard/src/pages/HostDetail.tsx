@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getEvents, type Event } from "../api/client";
-
+import { eventsToCSV, downloadCSV } from "../utils/csv";
 interface Props {
   hostId: string;
   onBack: () => void;
@@ -38,7 +38,13 @@ export function HostDetail({ hostId, onBack }: Props) {
         ← Filo görünümüne dön
       </button>
       <h2>{hostId}</h2>
-
+      <button
+        onClick={() => downloadCSV(`${hostId}-rapor.csv`, eventsToCSV(events))}
+        style={{ marginBottom: 16 }}
+        disabled={events.length === 0}
+    >
+         CSV olarak indir
+      </button>
       {error && <p style={{ color: "#ef4444" }}>Hata: {error}</p>}
       {!error && events.length === 0 && <p>Henuz hic event yok.</p>}
 
