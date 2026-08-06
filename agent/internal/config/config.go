@@ -26,6 +26,8 @@ type CheckConfig struct { //checks listesinin her bir elemanının karşılığ�
 	ThresholdWarning float64 `yaml:"threshold_warning"`
 	ThresholdError   float64 `yaml:"threshold_error"`
 	Mount            string  `yaml:"mount"` //sadece disk type check için kullanılacak varsayılanıboş string, cpu ve ram tipi checkler oluşturulurken hiç bakılmayacak disk tipi checklerde okunacak
+	URL              string  `yaml:"url"`
+	ExpectStatus     int     `yaml:"expect_status"`
 }
 
 type QueueConfig struct { //yaml queue bloğu karşılığı

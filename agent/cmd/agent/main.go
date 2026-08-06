@@ -117,6 +117,8 @@ func buildCheck(cfg config.CheckConfig) (checks.Check, error) { //yaml'dan gelen
 			ThresholdWarn:  cfg.ThresholdWarning,
 			ThresholdError: cfg.ThresholdError,
 		}, nil //disk için mount alanını da aktarıyor
+	case "http_check":
+		return checks.HTTPCheck{URL: cfg.URL, ExpectedStatus: cfg.ExpectStatus}, nil
 	default:
 		return nil, fmt.Errorf("bilinmeyen check tipi: %s", cfg.Type)
 	}

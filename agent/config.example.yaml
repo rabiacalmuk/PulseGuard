@@ -22,6 +22,10 @@ checks:
     mount: "C:"
     threshold_warning: 85
     threshold_error: 92
+  - type: http_check
+    interval_seconds: 30
+    url: "http://localhost:8080/api/v1/hosts"
+    expect_status: 200
 
 queue:
   path: "./queue.db"
