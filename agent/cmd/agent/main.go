@@ -1,8 +1,10 @@
 package main // bu bir kütüphane paketi değil, çalıştırılabilir ve fonksiyon bulundurması gereken bir program. mutlaka bir func main() olması gerekir, bu da programın başlangıç noktası olur
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	"pulseguard/agent/internal/checks"
 	"pulseguard/agent/internal/config"
@@ -76,6 +78,25 @@ func main() { //programın çalışmaya başladığı ilk fonksiyon, program ça
 	} //gönderim başarılıysa bu eventler kuyruktan siliniyor çünkü zaten collector'a ulaştılar
 
 	fmt.Println("batch basariyla gonderildi")
+	writeStatus(len(events))
+}
+
+type agentStatus struct {
+	LastRunAt  string `json:"last_run_at"`
+	EventsSent int    `json:"events_sent"`
+}
+
+func writeStatus(eventCount int) {
+	status := agentStatus{
+		LastRunAt:  time.Now().UTC().Format(time.RFC3339),
+		EventsSent: eventCount,
+	}
+	data, err := json.MarshalIndent(status, "", "  ")
+	if err != nil {
+		return
+	}
+	os.WriteFile("status.json", data, 0644)
+
 }
 
 func buildCheck(cfg config.CheckConfig) (checks.Check, error) { //yaml'dan gelen ham CheckConfig'i alıp doğru tipte bir checks.Check döndüren bir yardımcı fonksiyondur
