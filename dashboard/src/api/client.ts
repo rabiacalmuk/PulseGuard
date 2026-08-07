@@ -43,3 +43,32 @@ export async function getEvents(hostId?: string): Promise<Event[]> {
   const data = await res.json();
   return data.events;
 }
+export interface ThresholdValue {
+  warning: number;
+  error: number;
+}
+
+export interface ThresholdsData {
+  host_id: string;
+  thresholds: Record<string, ThresholdValue>;
+}
+
+export async function getThresholds(hostId: string): Promise<ThresholdsData> {
+  const res = await fetch(`${BASE_URL}/api/v1/thresholds/${encodeURIComponent(hostId)}`);
+  if (!res.ok) {
+    throw new Error(`esikler alinamadi: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function setThresholds(hostId: string, thresholds: Record<string, ThresholdValue>): Promise<void> {
+  const res = await fetch(`${BASE_URL}/api/v1/thresholds/${encodeURIComponent(hostId)}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ thresholds }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`esikler kaydedilemedi: ${text}`);
+  }
+}

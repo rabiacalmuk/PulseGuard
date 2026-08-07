@@ -51,6 +51,14 @@ func migrate(db *sql.DB) error { //veritabanının yapısını oluşturan, günc
 		timestamp TEXT NOT NULL,
 		schema_version INTEGER NOT NULL
 	);
+	CREATE TABLE IF NOT EXISTS thresholds (
+		host_id TEXT NOT NULL,
+		check_type TEXT NOT NULL,
+		threshold_warning REAL NOT NULL,
+		threshold_error REAL NOT NULL,
+		PRIMARY KEY (host_id, check_type)
+	);
+	
 	`
 	_, err := db.Exec(schema)
 	return err
@@ -178,4 +186,46 @@ func (s *Store) ListEvents(hostID string, limit int) ([]schema.Event, error) { /
 		events = append(events, e)
 	}
 	return events, rows.Err()
+}
+
+type ThresholdPair struct {
+	Warning float64
+	Error   float64
+}
+
+func (s *Store) GetThresholds(hostID string) (map[string]ThresholdPair, error) {
+	rows, err := s.db.Query(
+		"SELECT check_type, threshold_warning, threshold_error FROM thresholds WHERE host_id = ?",
+		hostID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("esikler alinamadi: %w", err)
+	}
+	defer rows.Close()
+
+	result := make(map[string]ThresholdPair)
+	for rows.Next() {
+		var checkType string
+		var t ThresholdPair
+		if err := rows.Scan(&checkType, &t.Warning, &t.Error); err != nil {
+			return nil, fmt.Errorf("esik satiri okunamadi: %w", err)
+		}
+		result[checkType] = t
+	}
+	return result, rows.Err()
+}
+
+func (s *Store) SetThreshold(hostID, checkType string, t ThresholdPair) error {
+	_, err := s.db.Exec(
+		`INSERT INTO thresholds (host_id, check_type, threshold_warning, threshold_error)
+		VALUES (?, ?, ?, ?)
+		ON CONFLICT (host_id, check_type) DO UPDATE SET
+			threshold_warning = excluded.threshold_warning,
+			threshold_error = excluded.threshold_error`,
+		hostID, checkType, t.Warning, t.Error,
+	)
+	if err != nil {
+		return fmt.Errorf("esik kaydedilemedi: %w", err)
+	}
+	return nil
 }

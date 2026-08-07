@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getEvents, type Event } from "../api/client";
 import { eventsToCSV, downloadCSV } from "../utils/csv";
+import { ThresholdEditor } from "../components/ThresholdEditor";
 interface Props {
   hostId: string;
   onBack: () => void;
@@ -38,6 +39,7 @@ export function HostDetail({ hostId, onBack }: Props) {
         ← Filo görünümüne dön
       </button>
       <h2>{hostId}</h2>
+      <ThresholdEditor hostId={hostId} />
       <button
         onClick={() => downloadCSV(`${hostId}-rapor.csv`, eventsToCSV(events))}
         style={{ marginBottom: 16 }}
@@ -56,7 +58,7 @@ export function HostDetail({ hostId, onBack }: Props) {
             <th style={{ padding: 8 }}>Seviye</th>
             <th style={{ padding: 8 }}>Mesaj</th>
           </tr>
-        </thead>
+        </thead>  
         <tbody>
           {events.map((e) => (
             <tr key={e.event_id} style={{ borderBottom: "1px solid #f3f4f6" }}>

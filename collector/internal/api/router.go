@@ -21,12 +21,14 @@ func (s *Server) Router() http.Handler {
 	mux.HandleFunc("POST /api/v1/batches", s.handleCreateBatch)
 	mux.HandleFunc("GET /api/v1/hosts", s.handleListHosts)
 	mux.HandleFunc("GET /api/v1/events", s.handleListEvents)
+	mux.HandleFunc("GET /api/v1/thresholds/{host_id}", s.handleGetThresholds)
+	mux.HandleFunc("PUT /api/v1/thresholds/{host_id}", s.handleSetThresholds)
 	return withCORS(mux)
 }
 func withCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST,PUT, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 		if r.Method == http.MethodOptions {
