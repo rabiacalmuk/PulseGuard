@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"pulseguard/collector/internal/api"
+	"pulseguard/collector/internal/notify"
 	"pulseguard/collector/internal/store"
 )
 
@@ -22,7 +23,15 @@ func main() {
 		log.Println("uyari: PULSEGUARD_SHARED_SECRET tanimli degil, bos anahtar kullaniliyor")
 	}
 
-	server := api.NewServer(s, secret) //server'ı store ve secret ile oluşturuyoruz
+	webhookURL := os.Getenv("PULSEGUARD_WEBHOOK_URL")
+	notifier := notify.New(webhookURL)
+	if notifier.Enabled() {
+		log.Printf("webhook bildirimleri aktif: %s", webhookURL)
+	} else {
+		log.Println("webhook bildirimleri kapali (PULSEGUARD_WEBHOOK_URL tanimli degil)")
+	}
+
+	server := api.NewServer(s, secret, notifier) //server'ı store ve secret ile oluşturuyoruz
 
 	addr := ":8080"
 	log.Printf("collector %s adresinde dinliyor", addr)

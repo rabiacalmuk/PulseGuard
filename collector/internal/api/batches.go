@@ -37,5 +37,10 @@ func (s *Server) handleCreateBatch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("batch kabul edildi: batch_id=%s host_id=%s event_sayisi=%d", b.BatchID, b.HostID, len(b.Events))
+	for _, e := range b.Events {
+		if e.Level == schema.LevelWarning || e.Level == schema.LevelError {
+			s.notifier.SendEvent(e)
+		}
+	}
 	w.WriteHeader(http.StatusCreated)
 }
