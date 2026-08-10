@@ -5,3 +5,4 @@ node_modules/
 dist/
 .vscode/settings.json
 go.work.sum
+status.json
